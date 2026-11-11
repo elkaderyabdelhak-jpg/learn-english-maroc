@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn English Morocco</title>
+<style>
+body{font-family:Arial;text-align:center;background:linear-gradient(#38b6ff,#7b5cff);margin:0;padding:20px;min-height:100vh}
+.box{background:white;padding:25px;border-radius:20px;max-width:400px;margin:auto}
+h1{color:white}
+input{width:90%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:10px;font-size:16px}
+button{width:95%;padding:13px;border:none;border-radius:25px;font-size:18px;cursor:pointer;margin-top:10px}
+.login-btn{background:linear-gradient(to right,#00c853,#7b5cff);color:white}
+.google-btn{background:white;border:1px solid #ddd;color:#333}
+#msg{color:red;margin-top:10px}
+#home{display:none}
+</style>
+</head>
+<body>
+<h1>📖 Learn English Morocco 🇲🇦</h1>
+<div class="box" id="loginBox">
+<h2>Sign In</h2>
+<input id="email" type="email" placeholder="youremail@example.com">
+<input id="password" type="password" placeholder="Password">
+<button class="login-btn" onclick="loginEmail()">Log In</button>
+<p>Don't have an account? <a href="#" onclick="signupEmail()">Sign up</a></p>
+<hr>
+<button class="google-btn" onclick="loginGoogle()">G Continue with Google</button>
+<p id="msg"></p>
+</div>
+<div class="box" id="home">
+<h2 id="welcome">Welcome!</h2>
+<p id="userEmail"></p>
+<h3 id="word">Hello = السلام</h3>
+<p id="example">Hello, how are you?</p>
+<button class="login-btn" onclick="nextWord()">Next Word ➡️</button><br><br>
+<button onclick="logout()">Log Out</button>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyC2Rm7ft59D7whGK_ff59Z8hb1EvrL5bGA",
+  authDomain: "learn-english-morocco.firebaseapp.com",
+  projectId: "learn-english-morocco",
+  storageBucket: "learn-english-morocco.firebasestorage.app",
+  messagingSenderId: "306088785225",
+  appId: "1:306088785225:web:d1256f724ff43742179698"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+window.loginGoogle = async () => {
+  document.getElementById("msg").innerText = "Connecting to Google...";
+  try { await signInWithPopup(auth, provider); }
+  catch(e){ document.getElementById("msg").innerText = "Error: " + e.message; }
+};
+window.loginEmail = async () => {
+  try { await signInWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("password").value); }
+  catch(e){ document.getElementById("msg").innerText = e.message; }
+};
+window.signupEmail = async () => {
+  try { await createUserWithEmailAndPassword(auth, document.getElementById("email").value, document.getElementById("password").value); alert("Account created! Now Log In"); }
+  catch(e){ document.getElementById("msg").innerText = e.message; }
+};
+window.logout = () => signOut(auth);
+onAuthStateChanged(auth, (user) => {
+  if(user){
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("home").style.display="block";
+    document.getElementById("welcome").innerText = "Welcome " + (user.displayName || "Friend");
+    document.getElementById("userEmail").innerText = "Gmail: " + user.email + " ✅ Verified by Google";
+  } else {
+    document.getElementById("loginBox").style.display="block";
+    document.getElementById("home").style.display="none";
+  }
+});
+let words=[["Hello = السلام","Hello, how are you?"],["Apple = تفاحة","I eat an apple."],["Water = الماء","I drink water."],["Book = كتاب","This is my book."],["Dog = كلب","The dog is cute."],["School = مدرسة","I go to school."]];
+let i=0;
+window.nextWord = () => { i=(i+1)%words.length; document.getElementById("word").innerText=words[i][0]; document.getElementById("example").innerText=words[i][1]; };
+</script>
+</body>
+</html>
